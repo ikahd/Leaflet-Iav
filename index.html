@@ -18,20 +18,23 @@
       height: 100%;
       margin: 0;
       font-family: 'Calibri', sans-serif;
+      background: linear-gradient(to bottom, #073809, #700503); /* fond page */
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: linear-gradient(to bottom, #4CAF50, #E53935);
     }
-    h1 {
-      margin-top: 20px;
-      margin-bottom: 20px;
-      color: #FFF;
-      text-shadow: 1px 1px 2px #aaa;
-      font-size: 2rem;
-      font-weight: bold;
+    .title-bar {
+      width: 900%;
+      padding: 30px 0;
+      background-color: #700503; 
+      color: #fff;
       text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
+    
     #map {
       width: 900%;
       height: 100vh;
@@ -44,7 +47,7 @@
   </style>
 </head>
 <body>
-  <h1>Carte interactive du campus IAV</h1>
+  <div class="title-bar">Carte interactive du campus IAV</div>
   <div id="map"></div>
 
   <script>

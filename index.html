@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Carte centrée sur Rabat</title>
-
-  <!-- ✅ CDN Leaflet (pas besoin de fichiers locaux) -->
+  <title>Carte interactive de l'IAV Hassan II</title>
+  <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -18,28 +17,77 @@
     html, body {
       height: 100%;
       margin: 0;
+      font-family: 'Calibri', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(to bottom, #4CAF50, #E53935);
+    }
+    h1 {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      color: #FFF;
+      text-shadow: 1px 1px 2px #aaa;
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
     }
     #map {
-      width: 100%;
+      width: 900%;
       height: 100vh;
+      max-width: 1000px; 
+      max-height: 600px; 
+      border: 2px solid #2c3e50;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
+  <h1>Carte interactive du campus IAV</h1>
   <div id="map"></div>
 
   <script>
-    const map = L.map('map').setView([33.9766, -6.8657], 15);
+    const map = L.map('map').setView([33.9766, -6.8657], 16);
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-
-    L.marker([33.9766, -6.8657])
+    const smallIcon = L.icon({
+    iconUrl: 'images/iav-icon.png',   
+    iconSize:     [30, 30],      
+    iconAnchor:   [12, 25],       
+    popupAnchor:  [0, -25]        
+});
+    L.marker([33.9766, -6.8657],{ icon: smallIcon })
       .addTo(map)
       .bindPopup('<b>IAV</b><br>Département de topographie.')
       .openPopup();
+    const polygon = L.polygon([
+		[33.97717304607646, -6.86656211264768],
+		[33.977294525102415, -6.866340156691415],
+		[33.97711782828, -6.866147055009463],
+    [33.97698714601888, -6.866349034929665]
+	  ]).addTo(map).bindPopup('Pôle digital.');
+    polygon.on('click', function () {
+      map.fitBounds(polygon.getBounds(), { maxZoom:20});
+});
+    const line = L.polyline([
+    [33.9800, -6.8623],
+    [33.9776, -6.8646],
+    [33.9775, -6.8648],
+    [33.9765, -6.8658]
+], {
+    color: 'yellow',      
+    weight: 3,          
+    opacity: 0.7         
+}).addTo(map);
+
+line.bindPopup('Route internat-département');
+line.on('click', function() {
+    map.fitBounds(line.getBounds(), { maxZoom: 20 });
+});
   </script>
 </body>
 </html>

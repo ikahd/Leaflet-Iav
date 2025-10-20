@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carte centrée sur Rabat</title>
+  <link rel="shortcut icon" type="image/x-icon" href="images/favicon.ico" />
+  <link rel="stylesheet" href="leaflet.css" />
+  <script src="leaflet.js"></script>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    #map {
+      width: 70%;
+      height: 70%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script>
+
+    const map = L.map('map').setView([33.9766, -6.8657], 15);
+
+    
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    
+    L.marker([33.9766, -6.8657])
+      .addTo(map)
+      .bindPopup('<b>IAV</b><br>Département de topographie.')
+      .openPopup();
+
+    const polygon = L.polygon([
+		[33.9773, -6.8663],
+		[33.9770, -6.8661],
+		[33.9769, -6.8663],
+        [33.9771, -6.8665]
+	]).addTo(map).bindPopup('Pôle digital.');
+    polygon.on('click', function () {
+      map.fitBounds(polygon.getBounds(), { maxZoom: 20 });
+    });
+   const line = L.polyline([
+    [33.9800, -6.8623],
+    [33.9776, -6.8646],
+    [33.9775, -6.8648],
+    [33.9765, -6.8658]
+    ], {
+    color: 'blue',      
+    weight: 4,         
+    opacity: 0.7       
+    }).addTo(map);
+
+line.bindPopup('Route internat-département');
+  </script>
+</body>
+</html>
+ 

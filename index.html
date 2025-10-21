@@ -12,27 +12,33 @@
     crossorigin=""
   />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
+  <script src="Regions.geojson"></script>
   <style>
     html, body {
-      height: 100%;
+      height: 100;
       margin: 0;
       font-family: 'Calibri', sans-serif;
-      background: linear-gradient(to bottom, #073809, #700503); /* fond page */
+      background: linear-gradient(to bottom, #ffffff, #fffd78); 
       display: flex;
       flex-direction: column;
       align-items: center;
     }
     .title-bar {
-      width: 900%;
-      padding: 30px 0;
-      background-color: #700503; 
-      color: #fff;
+      width: 90%;                
+      max-width: 1200px;
+      padding: 25px 0;
+      margin: 20px auto;
+      background: linear-gradient(145deg, #fffde0, #6bb156, #fffde0);
+      color: #fffffb;            
       text-align: center;
       font-size: 2.5rem;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px #000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      font-weight: 700;
+      font-family: 'Calibri', sans-serif;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(248, 248, 248, 0.15);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2), 0 0 5px rgba(255,255,255,0.4);
+      position: relative;
+      overflow: hidden;
     }
     
     #map {
@@ -44,19 +50,32 @@
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
+    .info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    }
+    .info h4 {
+    margin: 0 0 5px;
+    color: #777;
+    }
   </style>
 </head>
 <body>
   <div class="title-bar">Carte interactive du campus IAV</div>
   <div id="map"></div>
-
+  </div>
   <script>
-    const map = L.map('map').setView([33.9766, -6.8657], 16);
-
+    const map = L.map('map').setView([33.9766, -6.8657],5);
+    
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
+    L.geoJSON(regions).addTo(map);
     const smallIcon = L.icon({
     iconUrl: 'images/iav-icon.png',   
     iconSize:     [30, 30],      
@@ -91,6 +110,105 @@ line.bindPopup('Route internat-département');
 line.on('click', function() {
     map.fitBounds(line.getBounds(), { maxZoom: 20 });
 });
+
+
+var info = L.control();
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+
+
+info.update = function (props) {
+		const contents = props ? `<b>${props.nom_region}</b><br />${props.Populatio} people / mi<sup>2</sup>` : 'Hover over a state';
+		this._div.innerHTML = `<h4>Population Marocaine</h4>${contents}`;
+	};
+
+info.addTo(map);
+
+function getColor(d) {
+		return d > 3162277.66   ? '#cb181d' :
+			     d > 1000000.00  ? '#fb6a4a' :
+			     d > 316227.77   ? '#fcae91' : 
+                             '#fee5d9';
+	}
+
+function style(feature) {
+    return {
+        fillColor: getColor(feature.properties.Populatio),
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+        fillOpacity: 0.7
+    };
+}
+L.geoJson(regions, {style: style}).addTo(map);
+
+function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.7
+    });
+
+    layer.bringToFront();
+    info.update(layer.feature.properties);
+}
+function resetHighlight(e) {
+    geojson.resetStyle(e.target);
+    info.update();
+}
+
+var geojson;
+// ... our listeners
+geojson = L.geoJson(regions).addTo(map); 
+
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());
+}
+
+function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+    });
+}
+
+geojson = L.geoJson(regions, {
+    style: style,
+    onEachFeature: onEachFeature
+}).addTo(map);
+
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        labels = [];
+
+    // loop through our density intervals and generate a label with a colored square for each interval
+    for (var i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    }
+
+    return div;
+};
+
+legend.addTo(map);
+
+
   </script>
 </body>
 </html>

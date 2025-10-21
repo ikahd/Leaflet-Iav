@@ -86,6 +86,9 @@
       .addTo(map)
       .bindPopup('<b>IAV</b><br>Département de topographie.')
       .openPopup();
+
+    
+
     const polygon = L.polygon([
 		[33.97717304607646, -6.86656211264768],
 		[33.977294525102415, -6.866340156691415],
@@ -193,20 +196,25 @@ var legend = L.control({position: 'bottomright'});
 legend.onAdd = function (map) {
 
     var div = L.DomUtil.create('div', 'info legend'),
-        grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+        grades = [219965.0, 316227.77,1000000.00,3162277.66 ],
         labels = [];
 
     // loop through our density intervals and generate a label with a colored square for each interval
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    for (let i = 0; i < grades.length; i++) {
+        let from = grades[i];
+        let to = grades[i + 1];
+
+        // créer un petit carré coloré avec style inline
+        labels.push(
+            `<i style="background:${getColor(from + 1)}; width:18px; height:18px; display:inline-block; margin-right:5px;"></i> ${from}${to ? `&ndash;${to}` : '+'}`
+        );
     }
 
+    div.innerHTML = labels.join('<br>');
     return div;
-};
+	};
 
-legend.addTo(map);
+	legend.addTo(map);
 
 
   </script>
